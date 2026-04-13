@@ -1,0 +1,174 @@
+{
+	"info": {
+		"_postman_id": "amazon-mq-demo-collection",
+		"name": "Amazon MQ Demo",
+		"description": "Collection for testing the Amazon MQ Demo API.\n\nEndpoints:\n- Health Check\n- Create Order\n- List Orders\n- Create Batch Orders\n- Queue Statistics",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/health",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "health"]
+				},
+				"description": "Check if the API and RabbitMQ connection are healthy."
+			},
+			"response": []
+		},
+		{
+			"name": "2. Create Single Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer_name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"items\": [\n        {\n            \"product\": \"iPhone 15 Pro\",\n            \"quantity\": 1,\n            \"price\": 1199.00\n        },\n        {\n            \"product\": \"AirPods Pro\",\n            \"quantity\": 2,\n            \"price\": 249.00\n        }\n    ],\n    \"shipping_address\": \"123 Main Street, New York, NY 10001\",\n    \"order_type\": \"express\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/orders",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders"]
+				},
+				"description": "Create a new order. The order will be published to the RabbitMQ queue."
+			},
+			"response": []
+		},
+		{
+			"name": "3. Create Test Order (for deletion demo)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer_name\": \"Test User\",\n    \"email\": \"test@test.com\",\n    \"items\": [\n        {\n            \"product\": \"Test Product\",\n            \"quantity\": 1,\n            \"price\": 0.01\n        }\n    ],\n    \"shipping_address\": \"Test Address\",\n    \"order_type\": \"standard\",\n    \"is_test\": true\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/orders",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders"]
+				},
+				"description": "Create a TEST order that can be identified and deleted in QueueExplorer.\n\nThis order has:\n- email: test@test.com\n- is_test: true\n\nYou can filter by these in QueueExplorer to find and delete test orders."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Create Batch Orders (10 orders)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"count\": 10\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/orders/batch",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders", "batch"]
+				},
+				"description": "Create multiple test orders at once.\n\nUseful for:\n- Populating the queue quickly\n- Demonstrating batch operations\n- Testing QueueExplorer search functionality"
+			},
+			"response": []
+		},
+		{
+			"name": "5. List Recent Orders",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/orders",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders"]
+				},
+				"description": "List orders created in this session.\n\nNote: This shows orders from API memory, not from the queue.\nTo see queue contents, use QueueExplorer or the Queue Stats endpoint."
+			},
+			"response": []
+		},
+		{
+			"name": "6. Queue Statistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/queue/stats",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "queue", "stats"]
+				},
+				"description": "Get statistics about the RabbitMQ queue.\n\nShows:\n- Number of messages in queue\n- Number of consumers\n- Connection information"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Create Express Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer_name\": \"Jane Smith\",\n    \"email\": \"jane.smith@example.com\",\n    \"items\": [\n        {\n            \"product\": \"MacBook Pro 14\",\n            \"quantity\": 1,\n            \"price\": 1999.00\n        }\n    ],\n    \"shipping_address\": \"456 Oak Avenue, Los Angeles, CA 90001\",\n    \"order_type\": \"express\",\n    \"notes\": \"Please handle with care - fragile item\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/orders",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders"]
+				},
+				"description": "Create an EXPRESS order with special handling notes."
+			},
+			"response": []
+		},
+		{
+			"name": "8. Create Prime Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"customer_name\": \"Bob Wilson\",\n    \"email\": \"bob.wilson@example.com\",\n    \"items\": [\n        {\n            \"product\": \"Apple Watch Ultra\",\n            \"quantity\": 1,\n            \"price\": 799.00\n        },\n        {\n            \"product\": \"Watch Band\",\n            \"quantity\": 3,\n            \"price\": 49.00\n        }\n    ],\n    \"shipping_address\": \"789 Pine Road, Chicago, IL 60601\",\n    \"order_type\": \"prime\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/orders",
+					"host": ["{{baseUrl}}"],
+					"path": ["api", "orders"]
+				},
+				"description": "Create a PRIME order (highest priority)."
+			},
+			"response": []
+		}
+	]
+}

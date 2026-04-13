@@ -1,0 +1,75 @@
+# ============================================
+# DOCKER COMPOSE - Local RabbitMQ for Testing
+# ============================================
+#
+# Use this to test locally WITHOUT Amazon MQ
+# Great for development before deploying to AWS
+#
+# Usage:
+#   docker-compose up -d
+#
+# Then update .env:
+#   RABBITMQ_HOST=localhost
+#   RABBITMQ_PORT=5672
+#   RABBITMQ_USERNAME=guest
+#   RABBITMQ_PASSWORD=guest
+#
+# Access RabbitMQ Console:
+#   http://localhost:15672
+#   Username: guest
+#   Password: guest
+# ============================================
+
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-demo
+    ports:
+      # AMQP port (non-SSL)
+      - "5672:5672"
+      # Management Console
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      # Persist data between restarts
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  rabbitmq_data:
+
+# ============================================
+# INSTRUCTIONS
+# ============================================
+#
+# 1. Start RabbitMQ:
+#    docker-compose up -d
+#
+# 2. Wait for it to be ready (30 seconds)
+#
+# 3. Update .env for local testing:
+#    RABBITMQ_HOST=localhost
+#    RABBITMQ_PORT=5672
+#    RABBITMQ_USERNAME=guest
+#    RABBITMQ_PASSWORD=guest
+#
+# 4. Run the API:
+#    python run_api.py
+#
+# 5. Open RabbitMQ Console:
+#    http://localhost:15672
+#
+# 6. Stop RabbitMQ:
+#    docker-compose down
+#
+# 7. Stop and remove data:
+#    docker-compose down -v
+# ============================================
